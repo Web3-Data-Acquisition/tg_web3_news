@@ -14,7 +14,7 @@ from app.utils.language_detection import language_detection
 API_ID = 20464789
 API_HASH = "87c3a2090b3c3fd98ea22da5e4d39a44"
 
-client = TelegramClient("session1", API_ID, API_HASH)
+client = TelegramClient("session", API_ID, API_HASH)
 
 
 class TgStream(BaseWorker):
@@ -23,7 +23,7 @@ class TgStream(BaseWorker):
         self.api_hash = API_HASH
         self.queue = asyncio.Queue()
 
-        self.client = TelegramClient("tg_session1", self.api_id, self.api_hash)
+        self.client = TelegramClient("tg_session", self.api_id, self.api_hash)
 
     async def event_handler(self, event):
         result = dict()
