@@ -5,11 +5,16 @@ import loguru
 from telethon import TelegramClient, events
 
 from app.core.base_worker import BaseWorker
+from app.utils.delete_chinese import remove_chinese_translation
+from app.utils.get_binance_symbol import get_support_symbols, extract_symbols
+from app.utils.get_symbol_price import get_symbol_price
+from app.utils.gpt_translation import get_gpt_translation
+from app.utils.language_detection import language_detection
 
 API_ID = 20464789
 API_HASH = "87c3a2090b3c3fd98ea22da5e4d39a44"
 
-client = TelegramClient("session", API_ID, API_HASH)
+client = TelegramClient("session1", API_ID, API_HASH)
 
 
 class TgStream(BaseWorker):
@@ -18,7 +23,7 @@ class TgStream(BaseWorker):
         self.api_hash = API_HASH
         self.queue = asyncio.Queue()
 
-        self.client = TelegramClient("tg_session", self.api_id, self.api_hash)
+        self.client = TelegramClient("tg_session1", self.api_id, self.api_hash)
 
     async def event_handler(self, event):
         result = dict()
@@ -48,38 +53,14 @@ class TgStream(BaseWorker):
 
     async def run(self):
         await self.client.connect()
-        channel_name_to_id = {'Cointime中文资讯': 1895128149,
-                              'Crypto_獵捕者合約帝': 1793451069,
-                              '币圈新闻即时快讯🅥': 1668307169,
-                              'BlockBeats': 1387109317,
-                              '链捕手 ChainCatcher': 1515681710,
-                              'Foresight News': 1526765830,
-                              '金色财经/币圈快讯7*24小时': 1549184965,
-                              '金色财经新闻频道': 1748596288,
-                              'Telo News 简体中文 - 加密货币｜DeFi ｜Web3': 1525379130,
-                              'TechFlow 深潮 ｜ News Feed': 1735732363,
-                              '分叉财经(crypto news)': 1515857362,
-                              '方程式新闻 BWEnews': 1279597711,
-                              '半只香蕉News丨📣📣': 2117032512,
-                              '【以太坊】币圈行情分析频道': 1880448894}
+        channel_name_to_id = {
+                              '方程式新闻 BWEnews': 1279597711,}
         self.client.add_event_handler(
             self.event_handler,
             events.NewMessage(
                 chats=[
-                    1895128149,
-                    1793451069,
-                    1668307169,
-                    1387109317,
-                    1515681710,
-                    1526765830,
-                    1549184965,
-                    1748596288,
-                    1525379130,
-                    1735732363,
-                    1515857362,
                     1279597711,
-                    2117032512,
-                    1880448894,
+
                 ]
             )
         )
@@ -100,8 +81,34 @@ class TgStream(BaseWorker):
 
             if result != {}:
                 loguru.logger.debug(result)
+
+                symbol = None
+                symbol_price = None
+                if result:
+                    results = remove_chinese_translation(result)
+                    if results:
+                        symbol_result = extract_symbols(results)
+                        if symbol_result:
+                            symbol = symbol_result[0]
+                            symbols = symbol + 'USDT'
+                            try:
+                                symbol_price = await get_symbol_price(symbols)
+                            except Exception as e:
+                                symbol_price = None
+                if symbol_price and symbol:
+                    data = f"symbol: {symbol} " + "\n" + f"price: {symbol_price}" + "\n" + result
+                elif symbol:
+                    data = f"symbol: {symbol} " + "\n" + result
+                else:
+                    data = result
+
+                Vietnamese_data = await get_gpt_translation(data)
+
                 await self.client.start()
-                await self.client.send_message(2312527705, f'{result}')
+                if data:
+                    await self.client.send_message(2312527705, f'{data}')
+                if Vietnamese_data:
+                    await self.client.send_message(2186132517, f'{Vietnamese_data}')
+
             else:
                 loguru.logger.error(f"不符合发送消息{result}")
-

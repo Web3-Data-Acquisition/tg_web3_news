@@ -1,2 +1,8 @@
 telethon == 1.38.1
 loguru == 0.7.2
+pydantic == 2.10.1
+pydantic-settings == 2.6.1
+openai == 1.55.0
+lingua-language-detector
+curl_cffi == 0.7.3
+starlette == 0.41.3
