@@ -102,11 +102,14 @@ class TgStream(BaseWorker):
                 else:
                     data = result
 
-                Vietnamese_data = await get_gpt_translation(data)
+                Vietnamese_data = remove_chinese_translation(data)
+                Vietnamese_data = await get_gpt_translation(Vietnamese_data)
 
                 await self.client.start()
+                # 中文频道
                 if data:
                     await self.client.send_message(2312527705, f'{data}')
+                # 越南语频道
                 if Vietnamese_data:
                     await self.client.send_message(2186132517, f'{Vietnamese_data}')
 

@@ -17,7 +17,7 @@ open_ai_client = AsyncOpenAI(
 async def get_gpt_translation(message):
     try:
         prompt = f"""
-            Please translate the following English text into Vietnamese::
+            Please translate the following text into Vietnamese:
             "{message}"
         """
         second_retry_limit = 3
