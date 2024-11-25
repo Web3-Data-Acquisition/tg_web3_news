@@ -41,11 +41,11 @@ class TgStream(BaseWorker):
             loguru.logger.info(f"title: {channel_name} | 频道id{channel_id} | 群名:{entity.title}"
                                f" | 内容:{text} | 时间:{publish_time}")
 
-            # result["body"] = text
-            # result["title"] = channel_name
+            result["body"] = text
+            result["title"] = channel_name
             # result["time"] = publish_time
 
-            await self.queue.put(text)
+            await self.queue.put(result)
 
         except Exception as e:
             loguru.logger.error(e)
@@ -54,13 +54,20 @@ class TgStream(BaseWorker):
     async def run(self):
         await self.client.connect()
         channel_name_to_id = {
-                              '方程式新闻 BWEnews': 1279597711,}
+            '方程式新闻 BWEnews': 1279597711,
+            'BlockBeats': 1387109317,
+            'Odaily星球日报': 1525105897,
+            'PANews Web3丨加密货币丨区块链新闻频道': 1456088978
+
+        }
         self.client.add_event_handler(
             self.event_handler,
             events.NewMessage(
                 chats=[
                     1279597711,
-
+                    1387109317,
+                    1525105897,
+                    1456088978
                 ]
             )
         )
@@ -77,41 +84,50 @@ class TgStream(BaseWorker):
                 print(f"{dialog} {e}")
 
         while True:
-            result = await self.queue.get()  # get the result from the queue
+            result_data = await self.queue.get()  # get the result from the queue
 
-            if result != {}:
-                loguru.logger.debug(result)
+            text = result_data.get('body', None)
+            title = result_data.get('title', None)
+            if text != {}:
+                loguru.logger.debug(text)
 
+                results = None
                 symbol = None
                 symbol_price = None
-                if result:
-                    results = remove_chinese_translation(result)
-                    if results:
-                        symbol_result = extract_symbols(results)
-                        if symbol_result:
-                            symbol = symbol_result[0]
-                            symbols = symbol + 'USDT'
-                            try:
-                                symbol_price = await get_symbol_price(symbols)
-                            except Exception as e:
-                                symbol_price = None
+                if text:
+                    if title in ['BlockBeats', 'Odaily星球日报', 'PANews Web3丨加密货币丨区块链新闻频道']:
+                        results = text
+                    else:
+                        results = remove_chinese_translation(text)
+                        if results:
+                            symbol_result = extract_symbols(results)
+                            if symbol_result:
+                                symbol = symbol_result[0]
+                                symbols = symbol + 'USDT'
+                                try:
+                                    symbol_price = await get_symbol_price(symbols)
+                                except Exception as e:
+                                    symbol_price = None
                 if symbol_price and symbol:
-                    data = f"symbol: {symbol} " + "\n" + f"price: {symbol_price}" + "\n" + result
+                    data = f"symbol: {symbol} " + "\n" + f"price: {symbol_price}" + "\n" + results
                 elif symbol:
-                    data = f"symbol: {symbol} " + "\n" + result
+                    data = f"symbol: {symbol} " + "\n" + results
                 else:
-                    data = result
+                    data = results
 
-                Vietnamese_data = remove_chinese_translation(data)
-                Vietnamese_data = await get_gpt_translation(Vietnamese_data)
+                Vietnamese_data = await get_gpt_translation(data)
 
                 await self.client.start()
                 # 中文频道
                 if data:
-                    await self.client.send_message(2312527705, f'{data}')
+                    # await self.client.send_message(2312527705, f'{data}')
+                    # 测试频道
+                    await self.client.send_message(2303279286, f'{data}')
                 # 越南语频道
                 if Vietnamese_data:
-                    await self.client.send_message(2186132517, f'{Vietnamese_data}')
+                    # await self.client.send_message(2186132517, f'{Vietnamese_data}')
+                    # 测试频道
+                    await self.client.send_message(2303279286, f'{Vietnamese_data}')
 
             else:
-                loguru.logger.error(f"不符合发送消息{result}")
+                loguru.logger.error(f"不符合发送消息{data}")
