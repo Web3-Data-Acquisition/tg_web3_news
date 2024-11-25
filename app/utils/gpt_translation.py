@@ -17,7 +17,7 @@ open_ai_client = AsyncOpenAI(
 async def get_gpt_translation(message):
     try:
         prompt = f"""
-            Please translate the following text into Vietnamese:
+            Please translate all text in the following paragraph into Vietnamese:
             "{message}"
         """
         second_retry_limit = 3
@@ -49,10 +49,12 @@ async def get_gpt_translation(message):
 
 
 async def main():
-    message = """Bybit Listing: Bybit to list MORPHOUSDT Perpetual Contract
+    message = """symbol: BICO 
+Bithumb Listing: [이벤트] 바이코노미(BICO), 퍼퍼(PUFFER) 원화 마켓 추가 기념 에어드랍 이벤트
+$BICO
 ————————————
-2024-11-22 16:58:00
-source: https://www.bybit.com/trade/usdt/MORPHOUSDT"""
+2024-11-25 14:11:10
+source: https://feed.bithumb.com/notice/1645254"""
     result = await get_gpt_translation(message)
     print(result)
 
