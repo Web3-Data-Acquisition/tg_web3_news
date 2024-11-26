@@ -8,3 +8,5 @@ curl_cffi == 0.7.3
 starlette == 0.41.3
 requests == 2.32.3
 python-telegram-bot
+aiokafka == 0.12.0
+websockets == 11.0.3

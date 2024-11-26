@@ -120,14 +120,14 @@ class TgStream(BaseWorker):
                 await self.client.start()
                 # 中文频道
                 if data:
-                    await self.client.send_message(2312527705, f'{data}')
+                    # await self.client.send_message(2312527705, f'{data}')
                     # 测试频道
-                    # await self.client.send_message(2303279286, f'{data}')
+                    await self.client.send_message(2303279286, f'{data}')
                 # 越南语频道
                 if Vietnamese_data:
-                    await self.client.send_message(2186132517, f'{Vietnamese_data}')
+                    # await self.client.send_message(2186132517, f'{Vietnamese_data}')
                     # 测试频道
-                    # await self.client.send_message(2303279286, f'{Vietnamese_data}')
+                    await self.client.send_message(2303279286, f'{Vietnamese_data}')
 
             else:
                 loguru.logger.error(f"不符合发送消息{data}")
