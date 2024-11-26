@@ -64,7 +64,7 @@ async def listen_to_tree_news():
                 link = response.get("link", None)
                 source = response.get("source", None)
 
-                if source in ['Proposals', 'Binance EN']:
+                if source in ['Proposals', 'Binance EN', 'Arkham']:
                     continue
 
                 if title and body and link:
