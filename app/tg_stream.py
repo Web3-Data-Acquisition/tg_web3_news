@@ -8,7 +8,7 @@ from app.core.base_worker import BaseWorker
 from app.utils.delete_chinese import remove_chinese_translation
 from app.utils.get_binance_symbol import get_support_symbols, extract_symbols
 from app.utils.get_symbol_price import get_symbol_price
-from app.utils.gpt_translation import get_gpt_translation
+from app.utils.gpt_translation import get_gpt_translation, get_gpt_china_translation
 from app.utils.language_detection import language_detection
 
 API_ID = 20464789
@@ -116,11 +116,11 @@ class TgStream(BaseWorker):
                     data = results
 
                 Vietnamese_data = await get_gpt_translation(data)
-
+                china_data = await get_gpt_china_translation(data)
                 await self.client.start()
                 # 中文频道
                 if data:
-                    await self.client.send_message(2312527705, f'{data}')
+                    await self.client.send_message(2312527705, f'{china_data}')
                     # 测试频道
                     # await self.client.send_message(2303279286, f'{data}')
                 # 越南语频道

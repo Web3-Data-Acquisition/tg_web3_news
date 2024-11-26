@@ -48,6 +48,40 @@ async def get_gpt_translation(message):
         loguru.logger.error(traceback.format_exc())
 
 
+async def get_gpt_china_translation(message):
+    try:
+        prompt = f"""
+            Please translate all the text in the following paragraph into Chinese:
+            "{message}"
+        """
+        second_retry_limit = 3
+        second_retry_count = 0
+        second_successful_completion = False
+
+        while (
+                second_retry_count < second_retry_limit
+                and not second_successful_completion
+        ):
+            try:
+                result = await open_ai_client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=0.1,
+                )
+                second_successful_completion = True  # 标记成功
+            except Exception as e:
+                loguru.logger.error(traceback.format_exc())
+                second_retry_count += 1  # 递增重试次数
+
+            answer = result.choices[0].message.content
+            return answer
+    except Exception as e:
+        loguru.logger.error(e)
+        loguru.logger.error(traceback.format_exc())
+
+
 async def main():
     message = """symbol: BICO 
 Bithumb Listing: [이벤트] 바이코노미(BICO), 퍼퍼(PUFFER) 원화 마켓 추가 기념 에어드랍 이벤트

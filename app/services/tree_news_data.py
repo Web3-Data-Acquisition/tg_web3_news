@@ -9,7 +9,7 @@ import json
 from loguru import logger
 from telethon.sync import TelegramClient, events
 
-from app.utils.gpt_translation import get_gpt_translation
+from app.utils.gpt_translation import get_gpt_translation, get_gpt_china_translation
 
 
 def close_ws(loop, ws):
@@ -77,11 +77,11 @@ async def listen_to_tree_news():
                     result = f"{body}"
                 else:
                     continue
-
+                chinese_result = await get_gpt_china_translation(result)
                 result_data = await get_gpt_translation(result)
                 async with TelegramClient('session_tree', API_ID, API_HASH) as client:
                     # 中文频道
-                    await client.send_message(2312527705, f'{result}')
+                    await client.send_message(2312527705, f'{chinese_result}')
                     # 测试频道
                     # await client.send_message(2303279286, f'{result}')
 
