@@ -46,55 +46,67 @@ API_HASH = "87c3a2090b3c3fd98ea22da5e4d39a44"
 
 async def listen_to_tree_news():
     while True:  # 持续尝试连接
-        # cookie = "tree_login_cookie=s%3A8Ymw67Jgjoi17eCg4zlEArABYU1ITAvC.cZfzz12wgwFEq3acfrot8370gLMmWXMqunkTZRf39%2Fo"
-        cookie = "tree_login_cookie=s%3ALHAPUfLQATiyC6OsD2y5_WwPDUXYXSNw.03pXdK2G7nVaSqQ9b9ARLtyihurFo6vutjsc59Ib8yE"
+        try:
+            # cookie = "tree_login_cookie=s%3A8Ymw67Jgjoi17eCg4zlEArABYU1ITAvC.cZfzz12wgwFEq3acfrot8370gLMmWXMqunkTZRf39%2Fo"
+            cookie = "tree_login_cookie=s%3ALHAPUfLQATiyC6OsD2y5_WwPDUXYXSNw.03pXdK2G7nVaSqQ9b9ARLtyihurFo6vutjsc59Ib8yE"
 
-        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-        ssl_context.check_hostname = False
-        ssl_context.verify_mode = ssl.CERT_NONE
+            ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
 
-        extra_headers = {"Cookie": cookie}
-        uri = "wss://news.treeofalpha.com/ws"  # 将此更改为您要连接的WebSocket服务器地址
-        async with websockets.connect(uri, extra_headers=extra_headers, ssl=ssl_context) as ws:
-            async for response in ws:
-                response = json.loads(response)
-                print(response)
-                title = response.get("title", None)
-                body = response.get("body", None)
-                link = response.get("link", None)
-                source = response.get("source", None)
+            extra_headers = {"Cookie": cookie}
+            uri = "wss://news.treeofalpha.com/ws"  # 将此更改为您要连接的WebSocket服务器地址
+            async with websockets.connect(
+                    uri,
+                    extra_headers=extra_headers,
+                    ssl=ssl_context,
+                    ping_interval=10,
+                    ping_timeout=10
+            ) as ws:
+                async for response in ws:
+                    response = json.loads(response)
+                    print(response)
+                    title = response.get("title", None)
+                    body = response.get("body", None)
+                    link = response.get("link", None)
+                    source = response.get("source", None)
 
-                if source in ['Proposals', 'Binance EN', 'Arkham']:
-                    continue
+                    if source in ['Proposals', 'Binance EN', 'Arkham']:
+                        continue
 
-                if title and body and link:
-                    result = f"{title}" + "\n" + body + "\n" + link
-                elif title and body:
-                    result = f"{title}" + "\n" + body
-                elif title:
-                    result = f"{title}"
-                elif body:
-                    result = f"{body}"
-                else:
-                    continue
-                chinese_result = await get_gpt_china_translation(result)
-                result_data = await get_gpt_translation(result)
-                async with TelegramClient('session_tree', API_ID, API_HASH) as client:
-                    # 中文频道
-                    if chinese_result:
-                        if len(chinese_result) > 4096:
-                            chinese_result = chinese_result[:4093] + '...'
-                        await client.send_message(2312527705, f'{chinese_result}')
-                        # 测试频道
-                        # await client.send_message(2303279286, f'{result}')
+                    if title and body and link:
+                        result = f"{title}" + "\n" + body + "\n" + link
+                    elif title and body:
+                        result = f"{title}" + "\n" + body
+                    elif title:
+                        result = f"{title}"
+                    elif body:
+                        result = f"{body}"
+                    else:
+                        continue
+                    chinese_result = await get_gpt_china_translation(result)
+                    result_data = await get_gpt_translation(result)
+                    async with TelegramClient('session_tree', API_ID, API_HASH) as client:
+                        # 中文频道
+                        if chinese_result:
+                            if len(chinese_result) > 4096:
+                                chinese_result = chinese_result[:4093] + '...'
+                            await client.send_message(2312527705, f'{chinese_result}')
+                            # 测试频道
+                            # await client.send_message(2303279286, f'{result}')
 
-                    # 越南语频道
-                    if result_data:
-                        if len(result_data) > 4096:
-                            result_data = result_data[:4093] + '...'
-                        await client.send_message(2186132517, f'{result_data}')
-                        # 测试频道
-                        # await client.send_message(2303279286, f'{result_data}')
+                        # 越南语频道
+                        if result_data:
+                            if len(result_data) > 4096:
+                                result_data = result_data[:4093] + '...'
+                            await client.send_message(2186132517, f'{result_data}')
+                            # 测试频道
+                            # await client.send_message(2303279286, f'{result_data}')
+        except Exception as e:
+            print(f"Failed to connect to WebSocket: {e}")
+        finally:
+            print("Reconnecting in 5 seconds...")
+            await asyncio.sleep(5)  # 等待 5 秒后重新连接
 
 
 async def main():
