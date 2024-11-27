@@ -81,12 +81,17 @@ async def listen_to_tree_news():
                 result_data = await get_gpt_translation(result)
                 async with TelegramClient('session_tree', API_ID, API_HASH) as client:
                     # 中文频道
-                    await client.send_message(2312527705, f'{chinese_result}')
-                    # 测试频道
-                    # await client.send_message(2303279286, f'{result}')
+                    if chinese_result:
+                        if len(chinese_result) > 4096:
+                            chinese_result = chinese_result[:4093] + '...'
+                        await client.send_message(2312527705, f'{chinese_result}')
+                        # 测试频道
+                        # await client.send_message(2303279286, f'{result}')
 
                     # 越南语频道
                     if result_data:
+                        if len(result_data) > 4096:
+                            result_data = result_data[:4093] + '...'
                         await client.send_message(2186132517, f'{result_data}')
                         # 测试频道
                         # await client.send_message(2303279286, f'{result_data}')
