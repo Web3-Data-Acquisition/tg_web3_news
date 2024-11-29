@@ -107,6 +107,7 @@ async def listen_to_tree_news():
         finally:
             print("Reconnecting in 5 seconds...")
             await asyncio.sleep(5)  # 等待 5 秒后重新连接
+        await asyncio.sleep(1)
 
 
 async def main():

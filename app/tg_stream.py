@@ -131,3 +131,4 @@ class TgStream(BaseWorker):
 
             else:
                 loguru.logger.error(f"不符合发送消息{data}")
+            await asyncio.sleep(1)
