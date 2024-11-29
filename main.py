@@ -23,7 +23,7 @@ async def main():
     await asyncio.gather(
         run_tg_stream(),
         run_tree_news(),
-        moonshot_news()
+        # moonshot_news()
     )
 
 
