@@ -93,7 +93,7 @@ async def tg_send_mseeage(title: str, data: list):
     try:
         api_id = 20464789
         api_hash = "87c3a2090b3c3fd98ea22da5e4d39a44"
-        client = TelegramClient('session_listing', api_id, api_hash)
+        client = TelegramClient('session_tree_moonshot', api_id, api_hash)
 
         result_message = f"🚀🚀🎉🎉 {title} 🎉🎉🚀🚀\n\n"
         for index, row in enumerate(data):
