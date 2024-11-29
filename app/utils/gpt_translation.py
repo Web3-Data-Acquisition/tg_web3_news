@@ -8,12 +8,16 @@ from openai import AsyncOpenAI
 
 from app.con.config import settings
 
+# open_ai_client = AsyncOpenAI(
+#     api_key=settings.API_KEY,
+#     base_url=settings.API_BASE
+# )
+API_BASE: str = "https://api.openai-sb.com/v1/"
+API_KEY: str = "sb-4dddef154335adacb0a1afbd2898053710ddecd9b47ba009"
 open_ai_client = AsyncOpenAI(
-    api_key=settings.API_KEY,
-    base_url=settings.API_BASE
+    api_key=API_KEY,
+    base_url=API_BASE
 )
-
-
 async def get_gpt_translation(message):
     try:
         prompt = f"""
