@@ -1,6 +1,6 @@
 import asyncio
 
-from app.services.get_moonshot_list import moonshot_main
+# from app.services.get_moonshot_list import moonshot_main
 from app.services.tree_news_data import listen_to_tree_news
 from app.tg_stream import TgStream
 
@@ -14,8 +14,8 @@ async def run_tree_news():
     tree_news_result = await listen_to_tree_news()
 
 
-async def moonshot_news():
-    tree_news_result = await moonshot_main()
+# async def moonshot_news():
+#     tree_news_result = await moonshot_main()
 
 
 async def main():
