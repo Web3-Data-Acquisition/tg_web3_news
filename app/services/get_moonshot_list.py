@@ -133,7 +133,7 @@ async def tg_send_mseeage(title: str, data: list):
         if english_result:
             if len(english_result) > 4096:
                 english_result = english_result[:4093] + '...'
-            await client.send_message(2375526101, f'{english_result}')
+            await client.send_message(4647226116, f'{english_result}')
             # 测试频道
             # await client.send_message(2303279286, f'{result_data}')
         await client.disconnect()

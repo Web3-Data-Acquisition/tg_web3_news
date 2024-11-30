@@ -107,7 +107,7 @@ async def listen_to_tree_news():
                         if english_result:
                             if len(english_result) > 4096:
                                 english_result = english_result[:4093] + '...'
-                            await client.send_message(2375526101, f'{english_result}')
+                            await client.send_message(4647226116, f'{english_result}')
                             # 测试频道
                             # await client.send_message(2303279286, f'{english_result}')
         except Exception as e:
