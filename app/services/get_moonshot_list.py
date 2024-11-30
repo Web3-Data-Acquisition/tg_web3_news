@@ -6,7 +6,7 @@ import loguru
 import requests
 from telethon.sync import TelegramClient
 
-from app.utils.gpt_translation import get_gpt_china_translation, get_gpt_translation
+from app.utils.gpt_translation import get_gpt_china_translation, get_gpt_translation, get_gpt_english_translation
 
 
 async def get_moonshot_list():
@@ -113,6 +113,7 @@ async def tg_send_mseeage(title: str, data: list):
 
         chinese_result = await get_gpt_china_translation(result_message)
         result_data = await get_gpt_translation(result_message)
+        english_result = await get_gpt_english_translation(result_message)
 
         await client.start()
         if chinese_result:
@@ -127,6 +128,12 @@ async def tg_send_mseeage(title: str, data: list):
             if len(result_data) > 4096:
                 result_data = result_data[:4093] + '...'
             await client.send_message(2186132517, f'{result_data}')
+            # 测试频道
+            # await client.send_message(2303279286, f'{result_data}')
+        if english_result:
+            if len(english_result) > 4096:
+                english_result = english_result[:4093] + '...'
+            await client.send_message(2375526101, f'{english_result}')
             # 测试频道
             # await client.send_message(2303279286, f'{result_data}')
         await client.disconnect()

@@ -9,7 +9,7 @@ import json
 from loguru import logger
 from telethon.sync import TelegramClient, events
 
-from app.utils.gpt_translation import get_gpt_translation, get_gpt_china_translation
+from app.utils.gpt_translation import get_gpt_translation, get_gpt_china_translation, get_gpt_english_translation
 
 
 def close_ws(loop, ws):
@@ -86,6 +86,8 @@ async def listen_to_tree_news():
                         continue
                     chinese_result = await get_gpt_china_translation(result)
                     result_data = await get_gpt_translation(result)
+                    english_result = await get_gpt_english_translation(result)
+
                     async with TelegramClient('session_tree', API_ID, API_HASH) as client:
                         # 中文频道
                         if chinese_result:
@@ -102,6 +104,12 @@ async def listen_to_tree_news():
                             await client.send_message(2186132517, f'{result_data}')
                             # 测试频道
                             # await client.send_message(2303279286, f'{result_data}')
+                        if english_result:
+                            if len(english_result) > 4096:
+                                english_result = english_result[:4093] + '...'
+                            await client.send_message(2375526101, f'{english_result}')
+                            # 测试频道
+                            # await client.send_message(2303279286, f'{english_result}')
         except Exception as e:
             print(f"Failed to connect to WebSocket: {e}")
         finally:
