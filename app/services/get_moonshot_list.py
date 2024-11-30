@@ -149,7 +149,7 @@ async def moonshot_main():
     while True:
         # 每分钟运行一次
         await moonhost_data_processing(cycle_selector)
-        await asyncio.sleep(60)  # 等待 60 秒
+        await asyncio.sleep(120)  # 等待 60 秒
 
 
 if __name__ == '__main__':
